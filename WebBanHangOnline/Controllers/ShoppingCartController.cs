@@ -213,8 +213,6 @@ namespace WebBanHangOnline.Controllers
             return Json(code);
         }
 
-
-
         [HttpPost]
         public ActionResult DeleteAll()
         {
