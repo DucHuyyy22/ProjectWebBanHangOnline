@@ -33,7 +33,7 @@
                         <th>#</th>
                         <th>Mã đơn hàng</th>
                         <th>Tên Khách hàng</th>
-                        <th>Phone</th>
+                        <th>Số Điện Thoại</th>
                         <th>Tiền</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
@@ -115,29 +115,4 @@
 </div>
 <!-- /.modal -->
 
-@section scripts{
-    <script>
-        $(document).ready(function () {
-            $('body').on('click', '.btnCapNhat', function () {
-                var id = $(this).data("id");
-                $('#txtOrderId').val(id);
-                $('#modal-default').modal('show');
-            });
-
-            $('body').on('click', '#btnLuu', function () {
-                var id = $('#txtOrderId').val();
-                var tt = $('#ddTrangThai').val();
-                $.ajax({
-                    url: '/admin/order/UpdateTT',
-                    type: 'POST',
-                    data: { id: id, trangthai: tt },
-                    success: function (res) {
-                        if (res.Success) {
-                            location.reload();
-                        }
-                    }
-                });
-            });
-        });
-    </script>
 }
