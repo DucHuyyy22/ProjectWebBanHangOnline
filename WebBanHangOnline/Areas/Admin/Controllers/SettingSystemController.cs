@@ -1,15 +1,20 @@
-﻿using WebBanHangOnline.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using WebBanHangOnline.Models;
 using WebBanHangOnline.Models.EF;
 
 namespace WebBanHangOnline.Areas.Admin.Controllers
 {
     public class SettingSystemController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db = new ApplicationDbContext(); //Lưu hoặc lấy thông tin từ bảng SystemSettings trong cơ sở dữ liệu.
         // GET: Admin/SettingSystem
         public ActionResult Index()
         {
-            return View();
+            return View(); // trả về một giao diện web 
         }
 
         public ActionResult Partial_Setting()
@@ -17,11 +22,11 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             return PartialView();
         }
         [HttpPost]
-        public ActionResult AddSetting(SettingSystemViewModel req)
+        public ActionResult AddSetting(SettingSystemViewModel req) //Dữ liệu từ form sẽ chứa các giá trị mà người dùng muốn cập nhật như tiêu đề, logo, email, v.v.
         {
             SystemSetting set = null;
             var checkTitle = db.SystemSettings.FirstOrDefault(x => x.SettingKey.Contains("SettingTitle"));
-            if (checkTitle == null)
+            if (checkTitle == null) //tạo mới một đối tượng SystemSetting và thêm nó vào cơ sở dữ liệu.
             {
                 set = new SystemSetting();
                 set.SettingKey = "SettingTitle";
@@ -33,6 +38,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                 checkTitle.SettingValue = req.SettingTitle;
                 db.Entry(checkTitle).State = System.Data.Entity.EntityState.Modified;
             }
+            ////cập nhật giá trị của cài đặt đó với dữ liệu người dùng nhập vào
             //logo
             var checkLogo = db.SystemSettings.FirstOrDefault(x => x.SettingKey.Contains("SettingLogo"));
             if (checkLogo == null)
@@ -117,7 +123,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                 KeySeo.SettingValue = req.SettingKeySeo;
                 db.Entry(KeySeo).State = System.Data.Entity.EntityState.Modified;
             }
-            db.SaveChanges();
+            db.SaveChanges(); //Lưu toàn bộ thay đổi vào cơ sở dữ liệu.
 
             return View("Partial_Setting");
         }
