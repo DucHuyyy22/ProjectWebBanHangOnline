@@ -1,239 +1,99 @@
-﻿@model PagedList.PagedList<WebBanHangOnline.Models.EF.News>
-@using PagedList.Mvc;
-@using PagedList;
-@{
-    ViewBag.Title = "Danh sách tin tức";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-}
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using WebBanHangOnline.Models;
+using WebBanHangOnline.Models.EF;
 
-@section naviheader
+namespace WebBanHangOnline.Areas.Admin.Controllers
 {
-    <!-- Left navbar links -->
-    <ul class= "navbar-nav" >
-        < li class= "nav-item" >
-            < a class= "nav-link" data - widget = "pushmenu" href = "#" role = "button" >< i class= "fas fa-bars" ></ i ></ a >
-        </ li >
-        < li class= "nav-item d-none d-sm-inline-block" >
-            < a href = "/admin" class= "nav-link" > Trang chủ </ a >
-        </ li >
-        < li class= "nav-item d-none d-sm-inline-block" >
-            < a href = "/admin/category" class= "nav-link" > @ViewBag.Title </ a >
-        </ li >
-    </ ul >
-}
-< !--Content Header(Page header)-- >
-< section class= "content-header" >
-    < div class= "container-fluid" >
-        < div class= "row mb-2" >
-            < div class= "col-sm-6" >
-                < h1 > Quản lý danh mục</h1>
-            </div>
-            <div class= "col-sm-6" >
-                < ol class= "breadcrumb float-sm-right" >
-                    < li class= "breadcrumb-item" >< a href = "#" > Home </ a ></ li >
-                    < li class= "breadcrumb-item active" > @ViewBag.Title </ li >
-                </ ol >
-            </ div >
-        </ div >
-    </ div >< !-- /.container - fluid-- >
-</ section >
-
-< !--Main content-- >
-< section class= "content" >
-
-    < !--Default box-- >
-    < div class= "card" >
-        < div class= "card-header" >
-            < h3 class= "card-title" > Danh sách @ViewBag.Title </ h3 >
-
-            < div class= "card-tools" >
-                < a href = "/admin/news/add" class= "btn btn-primary" > Thêm mới </ a >
-                < a href = "#" class= "btn btn-danger" id = "BtnDeleteAll" > Xóa </ a >
-            </ div >
-        </ div >
-        < div class= "card-body" >
-            < div class= "row" >
-                < div class= "col-6" >
-                    @using(Html.BeginForm("index", "News", FormMethod.Get, new { }))
-                    {
-                        < div class= "input-group input-group-sm" >
-                            @Html.TextBox("Searchtext", null, new { @class = "form-control" })
-                            @*<input type="text" name="searchtext" class="form-control">*@
-                            < span class= "input-group-append" >
-                                < button type = "submit" class= "btn btn-info btn-flat" > Tìm kiếm </ button >
-                            </ span >
-                        </ div >
-                    }
-                </ div >
-            </ div >
-            < table class= "table table-hover" >
-                < thead >
-                    < tr >
-                        < th >< input type = "checkbox" id = "SelectAll" /></ th >
-                        < th > STT </ th >
-                        < th > Hình ảnh </ th >
-                        < th > Tiêu đề </ th >
-                        < th > Ngày tạo </ th >
-                        < th > Hiển thị </ th >
-
-                        < th style = "width:150px;" ></ th >
-                    </ tr >
-                </ thead >
-                < tbody >
-                    @if(Model != null && Model.Any())
-                    {
-    var i = ((ViewBag.Page - 1) * ViewBag.PageSize) + 1;
-    foreach (var item in Model)
+    [Authorize(Roles = "Admin,Employee")] //Chỉ những người dùng có vai trò Admin hoặc Employee mới có thể truy cập controller này.
+    public class AdvController : Controller
     {
-        var strCheck = item.IsActive ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
-                            < tr id = "trow_@item.Id" >
-                                < td >< input type = "checkbox" class= "cbkItem" value = "@item.Id" /></ td >
-                                < td > @i </ td >
-                                < td >< img src = "@item.Image" width = "50" /></ td >
-                                < td > @item.Title </ td >
-                                < td > @item.CreatedDate.ToString("dd/MM/yyyy") </ td >
-                                < td class= "text-center" >
-                                    < a href = '#' data - id = "@item.Id" class= "btnActive" > @Html.Raw(strCheck) </ a >
-                                </ td >
-                                < td >
-                                    < a href = "/admin/news/edit/@item.Id" class= "btn btn-sm btn-primary" > Sửa </ a >
-                                    < a href = "#" data - id = "@item.Id" class= "btn btn-sm btn-danger btnDelete" > Xóa </ a >
-                                </ td >
-                            </ tr >
-                            i++;
-                        }
-                    }
-                    else
-{
-                        < tr >
-                            < td colspan = "4" > Không có bản ghi nào!!!</ td >
-                        </ tr >
-                    }
-                </ tbody >
-            </ table >
-
-            < div class= "row" >
-                < div class= "col-6" ></ div >
-                < div class= "col-6" style = "text-align:right;" >
-                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
-                </ div >
-            </ div >
-
-        </ div >
-        < !-- /.card - body-- >
-        < div class= "card-footer" >
-
-        </ div >
-        < !-- /.card - footer-- >
-    </ div >
-    < !-- /.card-- >
-
-</ section >
-< !-- /.content-- >
-
-@section scripts{
-    <script>
-        $(document).ready(function () {
-            $('body').on('click', '#BtnDeleteAll', function (e) {
-                e.preventDefault();
-var str = "";
-var checkbox = $(this).parents('.card').find('tr td input:checkbox');
-var i = 0;
-checkbox.each(function() {
-    if (this.checked) {
-            var _id = $(this).val();
-            if (i === 0)
-            {
-                str += _id;
-            }
-            else
-            {
-                str += "," + _id;
-            }
-            i++;
-        } else
+        private ApplicationDbContext db = new ApplicationDbContext(); //Khởi tạo đối tượng db để thao tác với cơ sở dữ liệu.
+        // GET: Admin/Posts
+        public ActionResult Index()
         {
-            checkbox.attr('selected', '');
+            var items = db.Posts.ToList(); // lấy toàn bộ danh sách bài quảng cáo từ bảng Posts và truyền danh sách này vào view để hiển thị.
+            return View(items);
         }
-        });
-    if (str.length > 0)
-    {
-        var conf = confirm('Bạn có muốn xóa các bản ghi này hay không?');
-        if (conf === true)
+        public ActionResult Add() //hiển thị trang thêm mới quảng cáo
         {
-                        $.ajax({
-            url: '/admin/news/deleteAll',
-                            type: 'POST',
-                            data: { ids: str },
-                            success: function(rs) {
-                    if (rs.success)
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Add(Adv model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.CreatedDate = DateTime.Now; //Gán CreatedDate với thời gian hiện tại. ngày tạo
+                model.ModifiedDate = DateTime.Now;//và ModifiedDate với thời gian hiện tại ngày sửa
+                db.Advs.Add(model);  // thêm
+                db.SaveChanges(); //Lưu đối tượng quảng cáo (Adv) vào cơ sở dữ liệu 
+                return RedirectToAction("Index"); //chuyển hướng về Index nếu thành công.
+            }
+            return View(model);
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var item = db.Advs.Find(id); //tìm quảng cáo theo id 
+            return View(item); //truyền vào view để hiển thị cho phép chỉnh sửa.
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Adv model)
+        {
+            if (ModelState.IsValid) //Kiểm tra tính hợp lệ của dữ liệu.
+            {
+                model.ModifiedDate = DateTime.Now; // gán thời gian
+                db.Advs.Attach(model);
+                db.Entry(model).State = System.Data.Entity.EntityState.Modified; //Gắn đối tượng model vào DbContext và đánh dấu trạng thái là Modified
+                db.SaveChanges(); //Lưu thay đổi vào cơ sở dữ liệu. 
+                return RedirectToAction("Index"); //Nếu thành công, chuyển hướng về trang Index.
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            var item = db.Advs.Find(id); //Tìm đối tượng quảng cáo theo id
+            if (item != null) //nếu tìm được 
+            {
+                db.Advs.Remove(item); //thực hiện xóa và trả về 
+                db.SaveChanges(); //lưu
+                return Json(new { success = true }); //trả về
+            }
+
+            return Json(new { success = false }); //ko tìm được thì trả về luôn 
+        }
+
+
+        [HttpPost]
+        // giống hệt ở trên 
+        public ActionResult DeleteAll(string ids)
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                var items = ids.Split(',');
+                if (items != null && items.Any())
+                {
+                    foreach (var item in items)
                     {
-                        location.reload();
+                        var obj = db.Advs.Find(Convert.ToInt32(item));
+                        db.Advs.Remove(obj);
+                        db.SaveChanges();
                     }
                 }
-            });
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
         }
+
     }
-});
-
-            $('body').on('change', '#SelectAll', function() {
-    var checkStatus = this.checked;
-    var checkbox = $(this).parents('.card-body').find('tr td input:checkbox');
-    checkbox.each(function() {
-        this.checked = checkStatus;
-        if (this.checked) {
-                checkbox.attr('selected', 'checked');
-            } else
-            {
-                checkbox.attr('selected', '');
-            }
-            });
-        });
-            $('body').on('click', '.btnDelete', function() {
-            var id = $(this).data("id");
-            var conf = confirm('Bạn có muốn xóa bản ghi này không?');
-            if (conf === true)
-            {
-                    $.ajax({
-                url: '/admin/news/delete',
-                        type: 'POST',
-                        data: { id: id },
-                        success: function(rs) {
-                        if (rs.success)
-                        {
-                                $('#trow_' + id).remove();
-                        }
-                    }
-                });
-            }
-        });
-
-            $('body').on('click', '.btnActive', function(e) {
-            e.preventDefault();
-            var btn = $(this);
-            var id = btn.data("id");
-                $.ajax({
-            url: '/admin/news/IsActive',
-                    type: 'POST',
-                    data: { id: id },
-                    success: function(rs) {
-                    if (rs.success)
-                    {
-                        if (rs.isAcive)
-                        {
-                            btn.html("<i class='fa fa-check text-success'></i>");
-                            //$(this).find("i").removeClass("fas fa-times text-danger")
-                            //$(this).find("i").addClass("fa fa-check text-success");
-                        }
-                        else
-                        {
-                            btn.html("<i class='fas fa-times text-danger'></i>");
-                        }
-                    }
-
-                }
-            });
-        });
-    });
-    </ script >
 }
