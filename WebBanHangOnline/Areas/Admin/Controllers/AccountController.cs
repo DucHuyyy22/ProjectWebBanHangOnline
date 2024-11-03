@@ -177,7 +177,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         private void AddErrors(IdentityResult result) // phương thức sử lý lỗi 
         {
-            foreach (var error in result.Errors)
+            foreach (var error in result.Errors) //
             {
                 ModelState.AddModelError("", error);
             }
